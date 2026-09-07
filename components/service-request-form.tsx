@@ -9,11 +9,27 @@ import { Button } from '@/components/ui/button';
 
 export default function ServiceRequestForm() {
   const [submitting, setSubmitting] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
   useEffect(() => {
     const reset = () => setSubmitting(false);
     window.addEventListener('pageshow', reset);
     return () => window.removeEventListener('pageshow', reset);
   }, []);
+
+  const submitRequest = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitting(true); setStatus('idle'); setErrorMessage('');
+    const form = event.currentTarget;
+    const data = Object.fromEntries(new FormData(form).entries());
+    try {
+      const response = await fetch('/api/service-request', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Your request could not be sent.');
+      form.reset(); setStatus('success');
+    } catch (error) { setErrorMessage(error instanceof Error ? error.message : 'Your request could not be sent.'); setStatus('error'); }
+    finally { setSubmitting(false); }
+  };
 
   return (
     <section className="serviceSection shell" id="request-service" aria-labelledby="service-title">
@@ -24,12 +40,10 @@ export default function ServiceRequestForm() {
         <ul><li>Computer setup & troubleshooting</li><li>Network & Wi-Fi support</li><li>Security guidance & system updates</li></ul>
         <div className="serviceNext"><strong>What happens next?</strong><p>I’ll review your request and contact you by email to discuss availability, scope, and any cost before work begins.</p></div>
       </div>
-      <form className="serviceForm" action="https://formsubmit.co/cadetzachary16339@gmail.com" method="POST" onSubmit={() => setSubmitting(true)}>
+      <form className="serviceForm" onSubmit={submitRequest}>
         <h3>Register & request a service</h3>
         <p className="formHint">Fields marked * are required. No password needed.</p>
-        <input type="hidden" name="_subject" value="New portfolio registration & service request" />
-        <input type="hidden" name="_template" value="table" />
-        <input type="hidden" name="_next" value="https://francwebportfolio.netlify.app/request-received" />
+        <input className="formTrap" type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" />
         <div className="serviceFields">
           <label htmlFor="request-name">Full name *<Input id="request-name" name="name" autoComplete="name" required maxLength={100} placeholder="Your full name" /></label>
           <label htmlFor="request-email">Email address *<Input id="request-email" name="email" type="email" autoComplete="email" required maxLength={254} placeholder="you@example.com" /></label>
@@ -39,7 +53,7 @@ export default function ServiceRequestForm() {
         </div>
         <p className="formHint" id="request-privacy">Please leave out passwords and sensitive account details. FormSubmit processes this form and emails your details to Franc.</p>
         <label className="serviceConsent"><input type="checkbox" name="contact_consent" value="I agree to be contacted about this request" required /> <span>I agree to share these details with Franc Cadet and be contacted about my request. *</span></label>
-        <Button type="submit" className="serviceSubmit" disabled={submitting}>{submitting ? 'Opening secure submission…' : 'Send my request'}<ArrowUpRight size={18} /></Button>
+        <Button type="submit" className="serviceSubmit" disabled={submitting}>{submitting ? 'Sending securely…' : 'Send my request'}<ArrowUpRight size={18} /></Button>
         <p className="formHint" role="status">{submitting ? 'Complete the verification on the next page. If it does not load, go back and try again.' : 'You’ll complete a spam check before your request is sent.'}</p>
         <p className="formHint">Trouble submitting? <a href="mailto:cadetzachary16339@gmail.com">Email me directly.</a></p>
       </form>
