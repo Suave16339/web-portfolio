@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -17,7 +17,7 @@ export default function ServiceRequestForm() {
     return () => window.removeEventListener('pageshow', reset);
   }, []);
 
-  const submitRequest = async (event: React.FormEvent<HTMLFormElement>) => {
+  const submitRequest = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSubmitting(true); setStatus('idle'); setErrorMessage('');
     const form = event.currentTarget;
@@ -51,10 +51,11 @@ export default function ServiceRequestForm() {
           <label htmlFor="request-service-type">Service *<NativeSelect id="request-service-type" name="service" required defaultValue=""><NativeSelectOption value="" disabled>Choose a service</NativeSelectOption><NativeSelectOption>IT support & troubleshooting</NativeSelectOption><NativeSelectOption>Computer & software setup</NativeSelectOption><NativeSelectOption>Networking & Wi-Fi support</NativeSelectOption><NativeSelectOption>Security guidance & updates</NativeSelectOption><NativeSelectOption>Other — describe below</NativeSelectOption></NativeSelect></label>
           <label className="fullField" htmlFor="request-message">How can I help? *<Textarea id="request-message" name="message" required minLength={10} maxLength={4000} rows={5} placeholder="Describe the issue or project, the device or setup, and when you need help." aria-describedby="request-privacy" /></label>
         </div>
-        <p className="formHint" id="request-privacy">Please leave out passwords and sensitive account details. FormSubmit processes this form and emails your details to Franc.</p>
+        <p className="formHint" id="request-privacy">Please leave out passwords and sensitive account details. Your request is sent securely to Franc by email.</p>
         <label className="serviceConsent"><input type="checkbox" name="contact_consent" value="I agree to be contacted about this request" required /> <span>I agree to share these details with Franc Cadet and be contacted about my request. *</span></label>
         <Button type="submit" className="serviceSubmit" disabled={submitting}>{submitting ? 'Sending securely…' : 'Send my request'}<ArrowUpRight size={18} /></Button>
-        <p className="formHint" role="status">{submitting ? 'Complete the verification on the next page. If it does not load, go back and try again.' : 'You’ll complete a spam check before your request is sent.'}</p>
+        {status === 'success' && <p className="formStatus success" role="status">Thank you. Your request was sent successfully. Franc will contact you by email.</p>}
+        {status === 'error' && <p className="formStatus error" role="alert">{errorMessage}</p>}
         <p className="formHint">Trouble submitting? <a href="mailto:cadetzachary16339@gmail.com">Email me directly.</a></p>
       </form>
     </section>
