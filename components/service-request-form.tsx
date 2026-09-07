@@ -29,7 +29,7 @@ export default function ServiceRequestForm() {
         <p className="formHint">Fields marked * are required. No password needed.</p>
         <input type="hidden" name="_subject" value="New portfolio registration & service request" />
         <input type="hidden" name="_template" value="table" />
-        <input type="hidden" name="_next" value="https://franc-cadet-portfolio.wyqqw7jtf8.chatgpt.site/request-received" />
+        <input type="hidden" name="_next" value="https://francwebportfolio.netlify.app/request-received" />
         <div className="serviceFields">
           <label htmlFor="request-name">Full name *<Input id="request-name" name="name" autoComplete="name" required maxLength={100} placeholder="Your full name" /></label>
           <label htmlFor="request-email">Email address *<Input id="request-email" name="email" type="email" autoComplete="email" required maxLength={254} placeholder="you@example.com" /></label>
