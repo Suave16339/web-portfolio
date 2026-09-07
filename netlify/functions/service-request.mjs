@@ -9,7 +9,7 @@ export default async (request) => {
     const { name, email, phone, service, message, website } = await request.json();
     if (website) return Response.json({ ok: true });
     const fields = { name: clean(name, 100), email: clean(email, 254), phone: clean(phone, 40), service: clean(service, 120), message: clean(message) };
-    if (!fields.name || !fields.email || !fields.service || fields.message.length < 10 || !/^[^\s@]+@[^\s@]+\\.[^\s@]+$/.test(fields.email)) {
+    if (!fields.name || !fields.email || !fields.service || fields.message.length < 10 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) {
       return Response.json({ error: 'Please complete all required fields.' }, { status: 400 });
     }
     const apiKey = Netlify.env.get('RESEND_API_KEY');
