@@ -35,9 +35,9 @@ export default async (request) => {
 
     const apiKey = Netlify.env.get('RESEND_API_KEY');
     const fromEmail = Netlify.env.get('RESEND_FROM_EMAIL');
-    if (!apiKey || !fromEmail) return Response.json({ error: 'Email service is not configured yet.' }, { status: 503 });
+    if (!apiKey) return Response.json({ error: 'Email service is not configured yet.' }, { status: 503 });
 
-    const sender = `Franc Cadet Portfolio <${fromEmail}>`;
+    const sender = `Franc Cadet Portfolio <${fromEmail || 'onboarding@resend.dev'}>`;
 
     await sendEmail(apiKey, {
       from: sender,
@@ -47,7 +47,7 @@ export default async (request) => {
       html: `<h2>New portfolio service request</h2><p><strong>Name:</strong> ${escapeHtml(fields.name)}</p><p><strong>Email:</strong> ${escapeHtml(fields.email)}</p><p><strong>Phone:</strong> ${escapeHtml(fields.phone || 'Not provided')}</p><p><strong>Service:</strong> ${escapeHtml(fields.service)}</p><p><strong>Request:</strong><br>${escapeHtml(fields.message).replace(/\n/g, '<br>')}</p>`,
     });
 
-    await sendEmail(apiKey, {
+    if (fromEmail) await sendEmail(apiKey, {
       from: sender,
       to: [fields.email],
       reply_to: OWNER_EMAIL,
